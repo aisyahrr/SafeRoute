@@ -4,6 +4,19 @@ Aplikasi anti-begal buat mahasiswa Universitas Pamulang. Tujuannya satu: bikin p
 
 Dibangun pas hackathon, jadi banyak keputusan desain dioptimalisasi buat **demo-able + works under demo conditions**, bukan buat scale.
 
+---
+
+## Tim MATA
+
+| Nama | Role |
+|---|---|
+| **Malika Shakila** | Hipster (design & product) |
+| **Muchtar Ali Anwar** | Hacker (engineering) |
+| **M Tohari Maolana** | Hustler (business & strategy) |
+| **Aisyah Rahmawati** | Hacker (engineering) |
+
+---
+
 ## Daftar Isi
 
 - [Fitur Utama](#fitur-utama)
@@ -13,6 +26,7 @@ Dibangun pas hackathon, jadi banyak keputusan desain dioptimalisasi buat **demo-
 - [Safety PIN Anti-Bypass](#safety-pin-anti-bypass)
 - [Skema Database](#skema-database)
 - [Arsitektur Realtime](#arsitektur-realtime)
+- [Struktur Project](#struktur-project)
 - [Setup Local](#setup-local)
 - [Setup Supabase](#setup-supabase)
 - [Setup Telegram Bot](#setup-telegram-bot)
@@ -20,6 +34,7 @@ Dibangun pas hackathon, jadi banyak keputusan desain dioptimalisasi buat **demo-
 - [Build APK](#build-apk)
 - [Demo Flow](#demo-flow)
 - [Trade-off & Limitasi](#trade-off--limitasi)
+- [Catatan Lisensi & Aset](#catatan-lisensi--aset)
 
 ---
 
@@ -377,15 +392,36 @@ alter publication supabase_realtime add table public.notifications;
 
 ---
 
+## Struktur Project
+
+```
+saferoute/
+├── App.tsx                  # entry, render MapScreen
+├── src/
+│   ├── lib/supabase.ts      # koneksi Supabase
+│   ├── lib/routing.ts       # algoritma routing + dangerRadiusM
+│   ├── types/index.ts       # tipe data (Report, DangerLevel, dll)
+│   ├── constants/config.ts  # level bahaya, region peta, ambang SOS
+│   ├── services/trips.ts    # heartbeat + trip service
+│   ├── data/dummyReports.ts # data seed buat demo
+│   └── screens/
+│       ├── MapScreen.tsx          # peta utama + marker + legenda
+│       └── NavigasiAktifScreen.tsx# navigasi aktif + heartbeat
+├── supabase/
+│   ├── schema.sql
+│   └── functions/
+│       ├── dead-man-check/index.ts
+│       └── manual-sos/index.ts
+└── .env.example
+```
+
+---
+
 ## Setup Local
 
 ```bash
-<<<<<<< HEAD
-cd saferoute
-=======
 git clone <repo-url>
-cd jagamalam
->>>>>>> origin/main
+cd saferoute
 npm install
 
 # .env (copy dari .env.example)
@@ -399,6 +435,8 @@ npx expo start --dev-client
 ```
 
 Butuh dev client (bukan Expo Go) karena `react-native-maps`, `expo-battery`, `expo-location` semua native module.
+
+> App tetap jalan tanpa Supabase (pakai data dummy di `src/data/dummyReports.ts`), tapi fitur backend belum aktif sampai env diisi.
 
 ---
 
@@ -485,7 +523,7 @@ select vault.create_secret(
 
 -- Jadwalin tiap menit
 select cron.schedule(
-  'jagamalam-dead-man-check',
+  'saferoute-dead-man-check',
   '* * * * *',
   $$
   select net.http_post(
@@ -510,48 +548,12 @@ Cek `status = succeeded` setelah 1-2 menit → cron aktif.
 ## Build APK
 
 ```bash
-<<<<<<< HEAD
-cp .env.example .env
-```
-Lalu isi `.env` dengan kredensial dari project Supabase kamu
-(Supabase Dashboard → Project Settings → API):
-```
-EXPO_PUBLIC_SUPABASE_URL=...
-EXPO_PUBLIC_SUPABASE_ANON_KEY=...
-```
-> App tetap jalan tanpa Supabase (pakai data dummy di `src/data/dummyReports.ts`),
-> tapi fitur backend belum aktif sampai env diisi.
-
-### 4. Jalankan
-```bash
-npx expo start
-```
-- Scan QR yang muncul pakai **Expo Go** (Android) / Camera (iOS)
-- Atau tekan `a` (Android emulator) / `i` (iOS simulator)
-
-> ⚠️ **Peta butuh dev build untuk fitur penuh.** react-native-maps jalan di Expo Go
-> dengan provider default. Kalau mau Google Maps + Heatmap, perlu dev build
-> (`npx expo run:android`) dan API key Google Maps.
-
-## Struktur Project
-
-```
-saferoute/
-├── App.tsx                  # entry, render MapScreen
-├── src/
-│   ├── lib/supabase.ts      # koneksi Supabase
-│   ├── types/index.ts       # tipe data (Report, DangerLevel, dll)
-│   ├── constants/config.ts  # level bahaya, region peta, ambang SOS
-│   ├── data/dummyReports.ts # data seed buat demo
-│   └── screens/
-│       └── MapScreen.tsx     # peta utama + marker + legenda
-└── .env.example
-=======
 npx eas-cli build -p android --profile preview
->>>>>>> origin/main
 ```
 
 Selesai (~15 menit), dapet URL download APK. Kirim ke channel `link-repo` di hackathon.
+
+> ⚠️ **Peta butuh dev build untuk fitur penuh.** `react-native-maps` jalan di Expo Go dengan provider default. Kalau mau Google Maps + Heatmap, perlu dev build (`npx expo run:android`) dan API key Google Maps.
 
 ---
 
@@ -602,4 +604,4 @@ Service role key Supabase **JANGAN PERNAH** di-`EXPO_PUBLIC_*` — bakal bundle 
 
 ---
 
-Dibuat untuk hackathon. Hubungi maintainer kalau lo nemu bug atau mau kontribusi.
+Dibuat untuk hackathon oleh **Tim MATA**. Hubungi maintainer kalau lo nemu bug atau mau kontribusi.
